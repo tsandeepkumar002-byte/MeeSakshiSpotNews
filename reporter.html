@@ -2,36 +2,197 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Reporter Submission</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mee Sakshi News Reporter Submission</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 40px; }
+    body {
+      font-family: 'Noto Sans Telugu', 'Mandali', Arial, sans-serif;
+      background: #f8f8f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: white;
+      width: 95%;
+      max-width: 650px;
+      margin-top: 20px;
+      padding: 25px 35px;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .logo img {
+      width: 160px;
+      display: inline-block;
+    }
+
+    h1 {
+      text-align: center;
+      color: #0078d7;
+      margin-bottom: 25px;
+      font-size: 1.8rem;
+      border-bottom: 2px solid #0078d7;
+      padding-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 10px;
+      color: #444;
+    }
+
     input, textarea {
       width: 100%;
-      margin: 8px 0;
       padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
       font-size: 16px;
+      font-family: inherit;
     }
+
+    textarea {
+      height: 120px;
+      resize: vertical;
+    }
+
+    input[type="file"] {
+      border: none;
+      font-size: 14px;
+    }
+
     button {
-      background-color: #007bff;
+      background: #0078d7;
       color: white;
       border: none;
-      padding: 10px 20px;
+      padding: 12px;
+      border-radius: 6px;
       cursor: pointer;
+      width: 100%;
       font-size: 16px;
-      border-radius: 5px;
+      margin-top: 20px;
     }
-    button:hover { background-color: #0056b3; }
+
+    button:hover {
+      background: #005bb5;
+    }
+
+    .preview {
+      margin-top: 30px;
+      border-top: 1px solid #ddd;
+      padding-top: 20px;
+    }
+
+    .news-preview {
+      text-align: justify;
+      font-size: 17px;
+      line-height: 1.6;
+      font-family: 'Noto Sans Telugu', 'Mandali', Arial, sans-serif;
+    }
+
+    .news-preview img {
+      display: block;
+      width: 100%;
+      max-height: 250px;
+      object-fit: cover;
+      margin: 10px 0;
+      border-radius: 8px;
+    }
+
+    .dateline {
+      color: #555;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .subheading {
+      font-weight: bold;
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .heading {
+      font-weight: bold;
+      font-size: 22px;
+      color: #000;
+      text-align: center;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
-  <h1>Reporter Submission</h1>
 
-  <input type="text" id="heading" placeholder="News Heading">
-  <input type="text" id="subheading" placeholder="Sub Heading">
-  <textarea id="details" placeholder="News Details"></textarea>
-  <br>
-  <button onclick="submitNews()">Submit</button>
+  <div class="container">
+    <div class="logo">
+      <img src="logo.png" alt="Mee Sakshi Logo">
+    </div>
+
+    <h1>Reporter Submission</h1>
+
+    <label for="reporter">Reporter Name</label>
+    <input type="text" id="reporter" placeholder="Enter reporter name">
+
+    <label for="dateline">Dateline (Place & Date)</label>
+    <input type="text" id="dateline" placeholder="e.g., Hyderabad, 12 Nov 2025">
+
+    <label for="heading">News Heading</label>
+    <input type="text" id="heading" placeholder="Enter news heading (Telugu or English)">
+
+    <label for="subheading">Subheading</label>
+    <input type="text" id="subheading" placeholder="Enter subheading">
+
+    <label for="details">News Details</label>
+    <textarea id="details" placeholder="Enter full news content (Telugu or English)"></textarea>
+
+    <label for="image">Upload News Image</label>
+    <input type="file" id="image" accept="image/*" onchange="previewImage(event)">
+
+    <button onclick="submitNews()">Submit</button>
+
+    <!-- Preview Section -->
+    <div class="preview" id="preview">
+      <div class="heading" id="prevHeading"></div>
+      <div class="subheading" id="prevSubheading"></div>
+      <div class="dateline" id="prevDateline"></div>
+      <img id="prevImage" style="display:none;">
+      <div class="news-preview" id="prevDetails"></div>
+    </div>
+  </div>
 
   <script src="api.js"></script>
+  <script>
+    function previewImage(event) {
+      const image = document.getElementById('prevImage');
+      image.src = URL.createObjectURL(event.target.files[0]);
+      image.style.display = 'block';
+    }
+
+    // Live text preview
+    document.getElementById('heading').addEventListener('input', e => {
+      document.getElementById('prevHeading').textContent = e.target.value;
+    });
+    document.getElementById('subheading').addEventListener('input', e => {
+      document.getElementById('prevSubheading').textContent = e.target.value;
+    });
+    document.getElementById('dateline').addEventListener('input', e => {
+      document.getElementById('prevDateline').textContent = e.target.value;
+    });
+    document.getElementById('details').addEventListener('input', e => {
+      document.getElementById('prevDetails').textContent = e.target.value;
+    });
+  </script>
+
 </body>
 </html>
