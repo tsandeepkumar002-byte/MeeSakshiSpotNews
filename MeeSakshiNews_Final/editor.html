@@ -1,0 +1,192 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mee Sakshi News - Editor Dashboard</title>
+  <style>
+    body {
+      font-family: 'Noto Sans Telugu', 'Mandali', Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      text-align: center;
+      background: #0078d7;
+      color: white;
+      padding: 15px 0;
+      font-size: 1.6rem;
+      font-weight: bold;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .news-card {
+      border-bottom: 1px solid #ddd;
+      padding: 15px 0;
+      margin-bottom: 15px;
+    }
+
+    .news-card:last-child {
+      border-bottom: none;
+    }
+
+    .news-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .news-header h2 {
+      margin: 0;
+      color: #0078d7;
+    }
+
+    .meta {
+      color: #555;
+      font-size: 14px;
+    }
+
+    .news-image {
+      width: 100%;
+      max-height: 250px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+
+    .actions {
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 6px;
+      margin-right: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      color: white;
+    }
+
+    .approve {
+      background: #28a745;
+    }
+
+    .reject {
+      background: #dc3545;
+    }
+
+    textarea {
+      width: 100%;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      padding: 8px;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+
+    .status {
+      font-weight: bold;
+      color: #333;
+      margin-top: 8px;
+    }
+
+    .logo {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .logo img {
+      width: 150px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    📰 Mee Sakshi News - Editor Panel
+  </header>
+
+  <div class="container" id="newsContainer">
+    <div class="logo">
+      <img src="logo.png" alt="Mee Sakshi Logo" />
+    </div>
+    <h2 style="text-align:center;">Pending News for Approval</h2>
+    <div id="newsList">Loading...</div>
+  </div>
+
+  <script>
+    const API_URL = "https://mee-sakshi-news-backend.onrender.com";
+
+    async function loadNews() {
+      const response = await fetch(`${API_URL}/list`);
+      const news = await response.json();
+      const container = document.getElementById("newsList");
+      container.innerHTML = "";
+
+      if (news.length === 0) {
+        container.innerHTML = "<p>No news items pending.</p>";
+        return;
+      }
+
+      news.forEach((item, index) => {
+        const card = document.createElement("div");
+        card.classList.add("news-card");
+
+        card.innerHTML = `
+          <div class="news-header">
+            <h2>${item.heading}</h2>
+            <span class="meta">Reporter: ${item.reporter || "Unknown"} | ${item.dateline || ""}</span>
+          </div>
+          <h4>${item.subheading || ""}</h4>
+          ${item.image ? `<img src="${item.image}" class="news-image" alt="news image" />` : ""}
+          <p>${item.details}</p>
+          <div class="status">Status: ${item.status}</div>
+
+          <textarea id="comment-${index}" placeholder="Add editor comments (optional)"></textarea>
+
+          <div class="actions">
+            <button class="approve" onclick="approveNews(${index})">Approve</button>
+            <button class="reject" onclick="rejectNews(${index})">Reject</button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    async function approveNews(index) {
+      const comment = document.getElementById(`comment-${index}`).value;
+      await fetch(`${API_URL}/approve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ index, comment })
+      });
+      alert("✅ News approved!");
+      loadNews();
+    }
+
+    async function rejectNews(index) {
+      const comment = document.getElementById(`comment-${index}`).value;
+      await fetch(`${API_URL}/reject`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ index, comment })
+      });
+      alert("❌ News rejected!");
+      loadNews();
+    }
+
+    loadNews();
+  </script>
+</body>
+</html>

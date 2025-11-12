@@ -1,0 +1,59 @@
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+import os
+
+app = Flask(__name__)
+CORS(app)
+
+UPLOAD_FOLDER = 'uploads'
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+news_list = []
+
+@app.route('/')
+def home():
+    return "✅ Mee Sakshi News Backend is Live!"
+
+@app.route('/submit', methods=['POST'])
+def submit_news():
+    reporter = request.form.get('reporter')
+    dateline = request.form.get('dateline')
+    heading = request.form.get('heading')
+    subheading = request.form.get('subheading')
+    details = request.form.get('details')
+    image = request.files.get('image')
+
+    image_url = None
+    if image:
+        image_path = os.path.join(UPLOAD_FOLDER, image.filename)
+        image.save(image_path)
+        image_url = f"/{image_path}"
+
+    news_item = {
+        "reporter": reporter,
+        "dateline": dateline,
+        "heading": heading,
+        "subheading": subheading,
+        "details": details,
+        "status": "pending",
+        "image": image_url
+    }
+    news_list.append(news_item)
+
+    return jsonify({"message": "News submitted successfully!", "data": news_item})
+
+@app.route('/list', methods=['GET'])
+def list_news():
+    return jsonify(news_list)
+
+@app.route('/approve', methods=['POST'])
+def approve_news():
+    index = request.json.get("index")
+    if index is not None and 0 <= index < len(news_list):
+        news_list[index]["status"] = "approved"
+        return jsonify({"message": "News approved successfully!"})
+    return jsonify({"error": "Invalid index"}), 400
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=10000)
