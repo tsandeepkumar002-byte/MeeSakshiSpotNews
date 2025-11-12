@@ -11,15 +11,30 @@ news_list = []
 
 @app.route('/submit', methods=['POST'])
 def submit_news():
-    data = request.get_json()
+    reporter = request.form.get("reporter")
+    dateline = request.form.get("dateline")
+    heading = request.form.get("heading")
+    subheading = request.form.get("subheading")
+    details = request.form.get("details")
+    image = request.files.get("image")
+
+    image_url = None
+    if image:
+        image.save(f"static/{image.filename}")
+        image_url = f"/static/{image.filename}"
+
     news_item = {
-        "heading": data.get("heading"),
-        "subheading": data.get("subheading"),
-        "details": data.get("details"),
+        "reporter": reporter,
+        "dateline": dateline,
+        "heading": heading,
+        "subheading": subheading,
+        "details": details,
+        "image": image_url,
         "status": "pending"
     }
     news_list.append(news_item)
     return jsonify({"message": "News submitted successfully!"}), 200
+
 
 @app.route('/list', methods=['GET'])
 def list_news():
